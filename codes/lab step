@@ -1,0 +1,163 @@
+===============================
+DEVOPS LAB EXECUTION STEPS
+===============================
+
+STEP 1: START SYSTEM
+
+Open:
+- Docker Desktop (Enable Kubernetes)
+- Jenkins (http://localhost:8080)
+- VS Code
+
+--------------------------------
+
+STEP 2: CHECK TOOLS
+
+java -version
+mvn -version
+docker --version
+kubectl version --client
+git --version
+
+--------------------------------
+
+STEP 3: JENKINS SETUP
+
+Install Plugins:
+- Git
+- Pipeline
+- Maven Integration
+
+Configure Maven:
+Manage Jenkins -> Global Tool Configuration
+Name: Maven
+Install automatically ✔
+
+Add DockerHub Credentials:
+Manage Jenkins -> Credentials -> Global -> Add
+
+ID: dockerhub-creds
+Username: YOUR_DOCKER_USERNAME
+Password: YOUR_DOCKER_PASSWORD
+
+--------------------------------
+
+STEP 4: PROJECT FILES
+
+Create files:
+- pom.xml
+- Dockerfile
+- deployment.yaml
+- deployment-v2.yaml
+- deployment-v3.yaml
+
+--------------------------------
+
+STEP 5: GIT COMMANDS
+
+V1 (main):
+
+git init
+git add .
+git commit -m "v1"
+git branch -M main
+git remote add origin https://github.com/YOUR_USERNAME/notification-app.git
+git push -u origin main
+
+------------------------
+
+V2:
+
+git checkout -b v2
+git add .
+git commit -m "v2"
+git push origin v2
+
+------------------------
+
+V3:
+
+git checkout -b v3
+git add .
+git commit -m "v3"
+git push origin v3
+
+--------------------------------
+
+STEP 6: JENKINS JOBS
+
+Create 3 Jobs:
+
+Job 1:
+Name: notif-v1
+Branch: main
+Image: v1
+Deploy: deployment.yaml
+
+Job 2:
+Name: notif-v2
+Branch: v2
+Image: v2
+Deploy: deployment-v2.yaml
+
+Job 3:
+Name: notif-v3
+Branch: v3
+Image: v3
+Deploy: deployment-v3.yaml
+
+Click "Build Now" for each
+
+--------------------------------
+
+STEP 7: VERIFY KUBERNETES
+
+kubectl get pods
+kubectl get svc
+
+--------------------------------
+
+STEP 8: ACCESS APPLICATION
+
+V1:
+
+kubectl port-forward service/notif-service-v1 9090:80
+http://localhost:9090
+
+------------------------
+
+V2:
+
+kubectl port-forward service/notif-service-v2 9091:80
+http://localhost:9091/alerts
+
+------------------------
+
+V3:
+
+kubectl port-forward service/notif-service-v3 9092:80
+http://localhost:9092/alerts
+
+--------------------------------
+
+STEP 9: CHECK LOGS
+
+kubectl logs -l app=notif-v1
+
+--------------------------------
+
+IMPORTANT NOTES
+
+- Always use port-forward (NodePort may not work)
+- Ensure Docker image name is correct
+- Check Jenkins logs if build fails
+
+--------------------------------
+
+FLOW:
+
+Git -> Jenkins -> Maven -> Docker -> Kubernetes -> Browser
+
+===============================
+END
+===============================
