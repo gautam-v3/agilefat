@@ -1,0 +1,54 @@
+pipeline {
+    agent any
+
+    tools {
+        maven 'Maven'
+    }
+
+    environment {
+        DOCKER_IMAGE = "YOUR_USERNAME/notification-app:v2"
+    }
+
+    stages {
+
+        stage('Clone Repo') {
+            steps {
+                git branch: 'v2',
+                url: 'https://github.com/YOUR_USERNAME/notification-app.git'
+            }
+        }
+
+        stage('Build Maven') {
+            steps {
+                bat 'mvn clean package'
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                bat "docker build -t %DOCKER_IMAGE% ."
+            }
+        }
+
+        stage('Push to DockerHub') {
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub-creds',
+                    usernameVariable: 'USER',
+                    passwordVariable: 'PASS'
+                )]) {
+                    bat """
+                    docker login -u %USER% -p %PASS%
+                    docker push %DOCKER_IMAGE%
+                    """
+                }
+            }
+        }
+
+        stage('Deploy to Kubernetes') {
+            steps {
+                bat 'kubectl apply -f deployment-v2.yaml'
+            }
+        }
+    }
+}
