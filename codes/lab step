@@ -37,8 +37,8 @@ Add DockerHub Credentials:
 Manage Jenkins -> Credentials -> Global -> Add
 
 ID: dockerhub-creds
-Username: YOUR_DOCKER_USERNAME
-Password: YOUR_DOCKER_PASSWORD
+Username:gautamv0305
+Password:Vennila@$33
 
 --------------------------------
 
